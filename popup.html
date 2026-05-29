@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Form AI Solver</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="header user-header">
+      <div class="user-profile">
+        <img src="avatar.png" alt="Avatar" class="avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23ccc\'/><text x=\'50\' y=\'50\' font-family=\'sans-serif\' font-size=\'40\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'central\'>D</text></svg>'">
+        <h2 class="username">DasTarrVn <span class="hearts">💕</span></h2>
+      </div>
+    </div>
+    
+    <div class="panel api-panel">
+      <h3>API Configuration</h3>
+      <div class="input-group">
+        <label for="apiKey">API Key:</label>
+        <input type="password" id="apiKey" placeholder="sk-..., sk-ant-..., AIza...">
+      </div>
+      <div class="button-group">
+        <button id="detectProviderBtn" class="btn primary">Detect Provider</button>
+        <button id="clearKeyBtn" class="btn danger">Clear</button>
+      </div>
+      
+      <div class="provider-info">
+        <span id="providerIcon"></span>
+        <span id="providerName">Unknown</span>
+      </div>
+
+      <div id="manualProviderGroup" class="input-group hidden">
+        <label for="providerSelect">Provider:</label>
+        <select id="providerSelect">
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic</option>
+          <option value="gemini">Gemini</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="modelSelect">Model:</label>
+        <select id="modelSelect">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+      <div class="status-msg" id="apiStatus"></div>
+    </div>
+
+    <div class="panel action-panel">
+      <h3>Actions</h3>
+      <button id="scanBtn" class="btn primary full-width">Scan Form Questions</button>
+      <div id="resultsArea" class="results-area hidden">
+        <!-- Scanned questions appear here -->
+      </div>
+      <button id="solveBtn" class="btn primary full-width hidden mt-10">Solve with AI</button>
+      <div id="loading" class="hidden">
+        <div class="spinner"></div>
+        <span>AI is analyzing options...</span>
+      </div>
+      <button id="fillBtn" class="btn success full-width hidden mt-10">Auto-Fill Answers</button>
+      <div class="status-msg" id="actionStatus"></div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
