@@ -179,11 +179,13 @@ async function fillAnswers(answers) {
       } else if (textInput) {
         textInput.value = ansText;
         textInput.dispatchEvent(new Event('input', { bubbles: true }));
+        textInput.dispatchEvent(new Event('change', { bubbles: true }));
         block.style.border = "2px solid #34a853";
         block.style.borderRadius = "8px";
       } else if (textArea) {
         textArea.value = ansText;
         textArea.dispatchEvent(new Event('input', { bubbles: true }));
+        textArea.dispatchEvent(new Event('change', { bubbles: true }));
         block.style.border = "2px solid #34a853";
         block.style.borderRadius = "8px";
       }
