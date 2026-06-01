@@ -67,7 +67,7 @@ function scanQuestions() {
     }
 
     const lowerText = text.toLowerCase();
-    const isPersonalInfo = ['email', 'mssv', 'mã số', 'họ và tên', 'họ tên', 'name', 'lớp', 'class', 'sđt', 'phone'].some(k => lowerText.includes(k));
+    const isPersonalInfo = ['email', 'mssv', 'mã số', 'họ và tên', 'họ tên', 'name', 'lớp', 'class', 'sđt', 'phone', 'khoa', 'ngành'].some(k => lowerText.includes(k));
 
     if (text && (!isPersonalInfo || (type !== 'short_answer' && type !== 'unknown'))) {
       questions.push({
@@ -213,5 +213,61 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ success: true });
     });
     return true; // Keep channel open for async response
+  } else if (request.action === 'randomFill') {
+    randomFillAnswers().then(() => {
+      sendResponse({ success: true });
+    });
+    return true; 
   }
 });
+
+async function randomFillAnswers() {
+  const questions = scanQuestions(); 
+  const questionBlocks = document.querySelectorAll('div[role="listitem"]');
+
+  for (const q of questions) {
+    const block = questionBlocks[q.blockIndex];
+    if (!block) continue;
+
+    try {
+      if (q.type === 'multiple_choice' || q.type === 'checkbox') {
+        const clickableOptions = q.type === 'multiple_choice' 
+          ? block.querySelectorAll('div[role="radio"]') 
+          : block.querySelectorAll('div[role="checkbox"]');
+          
+        if (clickableOptions.length > 0) {
+          const randomIndex = Math.floor(Math.random() * clickableOptions.length);
+          clickableOptions[randomIndex].click();
+          block.style.border = "2px solid #fbbc04"; 
+          block.style.borderRadius = "8px";
+        }
+      } else if (q.type === 'dropdown') {
+        const listbox = block.querySelector('div[role="listbox"]');
+        if (listbox) {
+          listbox.click();
+          await sleep(300);
+          
+          let activePopup = null;
+          const popupContainers = document.querySelectorAll('div.exportSelectPopup');
+          popupContainers.forEach(p => {
+              if(p.style.display !== 'none') activePopup = p;
+          });
+          
+          if (activePopup) {
+              const popupOptions = activePopup.querySelectorAll('div[role="option"]');
+              if (popupOptions.length > 1) {
+                  const randomIndex = Math.floor(Math.random() * (popupOptions.length - 1)) + 1;
+                  popupOptions[randomIndex].click();
+                  block.style.border = "2px solid #fbbc04";
+                  block.style.borderRadius = "8px";
+              }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to random fill question', q.id, e);
+    }
+    
+    await sleep(200);
+  }
+}

@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('scanBtn').addEventListener('click', scanForm);
   document.getElementById('solveBtn').addEventListener('click', solveWithAI);
   document.getElementById('fillBtn').addEventListener('click', fillForm);
+  document.getElementById('randomBtn').addEventListener('click', randomFill);
 });
 
 function detectProvider() {
@@ -122,9 +123,9 @@ function saveSettings() {
 
 function setStatus(elementId, text, color) {
   const el = document.getElementById(elementId);
-  el.textContent = text;
+  el.innerHTML = text;
   el.style.color = color;
-  setTimeout(() => el.textContent = '', 3000);
+  setTimeout(() => el.innerHTML = '', 3000);
 }
 
 async function scanForm() {
@@ -228,6 +229,30 @@ async function fillForm() {
     
     if (response && response.success) {
       setStatus('actionStatus', '✅ Form filled successfully!', '#34a853');
+    }
+  });
+}
+
+async function randomFill() {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  
+  if (!tab?.url?.includes('docs.google.com/forms')) {
+    setStatus('actionStatus', '❌ Not a Google Form page', '#ea4335');
+    return;
+  }
+  
+  const randomBtn = document.getElementById('randomBtn');
+  randomBtn.disabled = true;
+
+  chrome.tabs.sendMessage(tab.id, { action: 'randomFill' }, (response) => {
+    randomBtn.disabled = false;
+    if (chrome.runtime.lastError) {
+      setStatus('actionStatus', '❌ Please refresh the form page first', '#ea4335');
+      return;
+    }
+    
+    if (response && response.success) {
+      setStatus('actionStatus', '<img src="jackpot.png" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;margin-bottom:2px;"> Đã lụi thành công toàn bộ!', '#d93025');
     }
   });
 }
